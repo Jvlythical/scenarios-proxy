@@ -1,22 +1,90 @@
 import sys
 import pdb
+import json
 
-entry_map = {}
 entries = []
 
+class Sanitizer:
+
+    def __init__(self, obj):
+        self.obj = obj 
+
+    def sanitize(self):
+        self.traverse_and_sanitize(self.obj)
+        return h
+
+    def traverse_and_sanitize(self, obj):
+        if isinstance(obj, list):
+            for i, val in enumerate(obj):
+                self.traverse_helper(obj, i, val)
+        elif isinstance(obj, dict):
+            for key, val in obj.items():
+                self.traverse_helper(obj, key, val)
+            
+    def traverse_helper(self, obj, key, val):
+        if self.is_traversible(val):
+            self.traverse_and_sanitize(val)
+        else:
+            if not self.valid_value(val):
+                try:
+                    obj[key] = val.decode('utf-8')
+                except: 
+                    pass
+
+    def valid_value(self, val):
+        return isinstance(val, str) or isinstance(val, int) or isinstance(val, float)
+
+    def is_traversible(self, val):
+        return isinstance(value, dict) or isinstance(value, list)
+
+class HAR:
+
+    def __init__(self, entries):
+        self.version = "1.2"
+        self.entries = entries
+        self.pages = []
+        self.creator = {
+            'name': 'Mitmproxy2Har',
+            'version': '1.0',
+        }
+
+    def to_hash(self):
+        entries = []
+        for entry in self.entries:
+            entries.append(entry.to_hash()) 
+
+        return {
+            'log': {
+                'version': self.version,
+                'entries': self.entries,
+                'pages': self.pages,
+                'entries': entries
+            }
+        }
+
+    def to_hash(self):
+        h = self.to_hash()
+        s = Sanitizer(h)
+        return s.sanitize()
+        
 class Entry:
 
     def __init__(self, flow):
         self.id = flow.id
         self.started_date_time = flow.request.timestamp_start
+        self.time = 0
+        self.server_ip_address = flow.server_conn.ip_address[0]
         self.request = Request(flow.request)
         self.response = None
 
     def to_hash(self):
         return {
+            'time': self.time,
             'startedDateTime': self.started_date_time,
             'request': self.request.to_hash(),
-            'response': self.response.to_hash() if self.response else {}
+            'response': self.response.to_hash() if self.response else {},
+            '_resourceType': 'xhr',
+            'serverIPAddress': self.server_ip_address
         }
 
 class Request:
@@ -45,8 +113,8 @@ class Request:
     def with_query_params(self, query_params):
         for query_param in query_params.items():
             self.query_params.append({
-                'name': query_params[0],
-                'value': query_params[1],
+                'name': query_param[0],
+                'value': query_param[1],
             })
 
 
@@ -71,6 +139,7 @@ class Request:
             'httpVersion': self.http_version,
             'headers': self.headers,
             'queryString': self.query_params,
+            'postData': self.body_params
         }
 
 class Response:
@@ -84,11 +153,18 @@ class Response:
 
         self.with_headers(response.headers)
         self.with_cookies(response.cookies)
+        self.with_content(response.text) 
+
+    def with_content(self, text):
+        try:
+            text = text.decode()
+        except:
+            pass
 
         self.content = {
             #'mimeType': self.headers['Content-Type'],
-            'size': len(response.text),
-            'text': response.text
+            'size': len(text),
+            'text': text
         }
 
     def with_headers(self, headers):
@@ -102,7 +178,7 @@ class Response:
         for cookie in cookies.items():
             self.cookies.append({
                 'name': cookie[0],
-                'value': cookie[1]
+                'value': cookie[1][0]
             })
 
     def to_hash(self):
@@ -117,21 +193,19 @@ class Response:
 
 
 def request(flow):
-    print("Request %s" % flow.id)
-
-    entry = Entry(flow)
-    entries.append(entry)
-    entry_map[flow.id] = entry
+    pass
 
 def response(flow):
-    print("Response %s" % flow.id)
+    entry = Entry(flow)
 
     response = Response(flow.response)
+    entry.response = response
+    entry.time = (flow.response.timestamp_end - flow.request.timestamp_start) * 1000
 
-    if flow.id in entry_map:
-        entry = entry_map[flow.id]
-        entry.response = response
-        pdb.set_trace()
+    entries.append(entry)
 
 def done():
-    sys.exit(1)  # we did not see the request
+    har = HAR(entries)
+    fp = open('/tmp/scenario.har', 'w')
+    fp.write(json.dumps(har.to_hash(), indent=2))
+    sys.exit(1)
