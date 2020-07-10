@@ -93,6 +93,8 @@ class Request:
         self.method = request.method
         self.url = request.url
         self.http_version = request.http_version
+        self.mime_type = ''
+
         self.headers = []
         self.query_params = []
         self.body_params = []
@@ -106,13 +108,16 @@ class Request:
 
         if len(self.body_params) > 0:
             self.post_data = {
-                'mimeType': 'abc',
+                'mimeType': self.mime_type,
                 'text': request.text,
                 'params': self.body_params
             }
 
     def with_headers(self, headers):
         for header in headers.items():
+            if header[0] == 'Content-Type':
+                self.mime_type = header[1]
+
             self.headers.append({
                 'name': header[0],
                 'value': header[1],
@@ -156,6 +161,8 @@ class Response:
         self.status = response.status_code
         self.status_text = response.reason
         self.http_version = response.http_version
+        self.mime_type = ''
+
         self.headers = []
         self.cookies = []
 
@@ -164,19 +171,17 @@ class Response:
         self.with_content(response.text) 
 
     def with_content(self, text):
-        try:
-            text = text.decode()
-        except:
-            pass
-
         self.content = {
-            #'mimeType': self.headers['Content-Type'],
+            'mimeType': self.mime_type,
             'size': len(text),
             'text': text
         }
 
     def with_headers(self, headers):
         for header in headers.items():
+            if header[0] == 'Content-Type':
+                self.mime_type = header[1]
+
             self.headers.append({
                 'name': header[0],
                 'value': header[1],
