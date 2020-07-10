@@ -11,7 +11,7 @@ class Sanitizer:
 
     def sanitize(self):
         self.traverse_and_sanitize(self.obj)
-        return h
+        return self.obj
 
     def traverse_and_sanitize(self, obj):
         if isinstance(obj, list):
@@ -35,7 +35,7 @@ class Sanitizer:
         return isinstance(val, str) or isinstance(val, int) or isinstance(val, float)
 
     def is_traversible(self, val):
-        return isinstance(value, dict) or isinstance(value, list)
+        return isinstance(val, dict) or isinstance(val, list)
 
 class HAR:
 
@@ -62,7 +62,7 @@ class HAR:
             }
         }
 
-    def to_hash(self):
+    def to_sanitized_hash(self):
         h = self.to_hash()
         s = Sanitizer(h)
         return s.sanitize()
@@ -102,6 +102,14 @@ class Request:
         self.with_query_params(request.query) 
         self.with_cookies(request.cookies)
         self.with_body_params(request.multipart_form)
+        self.post_data = None
+
+        if len(self.body_params) > 0:
+            self.post_data = {
+                'mimeType': 'abc',
+                'text': request.text,
+                'params': self.body_params
+            }
 
     def with_headers(self, headers):
         for header in headers.items():
@@ -139,7 +147,7 @@ class Request:
             'httpVersion': self.http_version,
             'headers': self.headers,
             'queryString': self.query_params,
-            'postData': self.body_params
+            'postData': self.post_data 
         }
 
 class Response:
@@ -207,5 +215,5 @@ def response(flow):
 def done():
     har = HAR(entries)
     fp = open('/tmp/scenario.har', 'w')
-    fp.write(json.dumps(har.to_hash(), indent=2))
+    fp.write(json.dumps(har.to_sanitized_hash(), indent=2))
     sys.exit(1)
