@@ -2,71 +2,9 @@ import sys
 import pdb
 import json
 
-entries = []
+STORAGE_PATH = '/tmp/entries.txt'
+STORAGE_FP = open(STORAGE_PATH, 'a')
 
-class Sanitizer:
-
-    def __init__(self, obj):
-        self.obj = obj 
-
-    def sanitize(self):
-        self.traverse_and_sanitize(self.obj)
-        return self.obj
-
-    def traverse_and_sanitize(self, obj):
-        if isinstance(obj, list):
-            for i, val in enumerate(obj):
-                self.traverse_helper(obj, i, val)
-        elif isinstance(obj, dict):
-            for key, val in obj.items():
-                self.traverse_helper(obj, key, val)
-            
-    def traverse_helper(self, obj, key, val):
-        if self.is_traversible(val):
-            self.traverse_and_sanitize(val)
-        else:
-            if not self.valid_value(val):
-                try:
-                    obj[key] = val.decode('utf-8')
-                except: 
-                    pass
-
-    def valid_value(self, val):
-        return isinstance(val, str) or isinstance(val, int) or isinstance(val, float)
-
-    def is_traversible(self, val):
-        return isinstance(val, dict) or isinstance(val, list)
-
-class HAR:
-
-    def __init__(self, entries):
-        self.version = "1.2"
-        self.entries = entries
-        self.pages = []
-        self.creator = {
-            'name': 'Mitmproxy2Har',
-            'version': '1.0',
-        }
-
-    def to_hash(self):
-        entries = []
-        for entry in self.entries:
-            entries.append(entry.to_hash()) 
-
-        return {
-            'log': {
-                'version': self.version,
-                'entries': self.entries,
-                'pages': self.pages,
-                'entries': entries
-            }
-        }
-
-    def to_sanitized_hash(self):
-        h = self.to_hash()
-        s = Sanitizer(h)
-        return s.sanitize()
-        
 class Entry:
 
     def __init__(self, flow):
@@ -204,7 +142,6 @@ class Response:
             'content': self.content,
         }
 
-
 def request(flow):
     pass
 
@@ -215,10 +152,7 @@ def response(flow):
     entry.response = response
     entry.time = (flow.response.timestamp_end - flow.request.timestamp_start) * 1000
 
-    entries.append(entry)
+    fp.write(json.dumps(entry, indent = 2))
 
 def done():
-    har = HAR(entries)
-    fp = open('/tmp/scenario.har', 'w')
-    fp.write(json.dumps(har.to_sanitized_hash(), indent=2))
     sys.exit(1)
