@@ -152,7 +152,7 @@ def response(flow):
     entry.response = response
     entry.time = (flow.response.timestamp_end - flow.request.timestamp_start) * 1000
 
-    fp.write(json.dumps(entry, indent = 2))
+    STORAGE_FP.write(json.dumps(entry.to_hash())  + "\n")
 
 def done():
     sys.exit(1)
