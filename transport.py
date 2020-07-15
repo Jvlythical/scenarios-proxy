@@ -1,7 +1,8 @@
 import os
-import request
+import requests
 import json
 import time
+import pdb
 
 STORAGE_PATH = '/tmp/entries.txt'
 STORAGE_FP = open(STORAGE_PATH, 'r')
@@ -53,7 +54,7 @@ class HAR:
     def to_hash(self):
         entries = []
         for entry in self.entries:
-            entries.append(entry.to_hash()) 
+            entries.append(entry) 
 
         return {
             'log': {
@@ -75,17 +76,18 @@ class ScenarioProxy:
         self.service_url = 'http://localhost:3000'
         self.requests_path = 'requests'
 
-    def requests_create(har_dict):
-        path = "%s/%s" % [self.service_url, self.requests_path]
+    def requests_create(self, har_dict):
+        path = "%s/%s" % (self.service_url, self.requests_path)
         headers = {
-            'HTTP_X_API_KEY': os.environ['SCENARIO_API_KEY'],
+            'CONTENT_TYPE' : 'application/json',
+            'X_API_KEY': os.environ['SCENARIO_API_KEY'],
         }
         body = {
             'project_id': os.environ['SCENARIO_PROJECT_ID'], 
             'requests': har_dict,
         }
 
-        requests.post(path, data = body, headers = headers)
+        requests.post(path, data = json.dumps(body), headers = headers)
 
 if __name__ == '__main__':
     proxy = ScenarioProxy()
@@ -93,14 +95,17 @@ if __name__ == '__main__':
     while True:
         entries = []        
 
-        entries_json_list = fp.read().split("\n")
-        if len(entries_json_list) > 0:
-            for entries_json in entries_json_list:
-                try:
-                    entries.append(json.loads(entries_json))
-                except:
-                    continue 
+        entries_json_list = STORAGE_FP.read().split("\n")
+        for entries_json in entries_json_list:
+            try:
+                entry = json.loads(entries_json)
+                entries.append(entry)
+            except:
+                continue 
 
+        print "Read %s entries" % len(entries)
+
+        if len(entries) > 0:
             har = HAR(entries)
             har_dict = har.to_sanitized_hash()
 
