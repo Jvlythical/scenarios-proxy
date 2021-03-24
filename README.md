@@ -19,8 +19,7 @@ Mock API and/or proxy for a HTTP service. Uses scenarios-backend to retrieve moc
 * Inject pip packages into mitmproxy
 
     ```
-    pipx inject mitmproxy requests
-    pipx inject mitmproxy pyyaml
+    pipx inject mitmproxy requests  pyyaml
     ```
 
 ## Getting Started
