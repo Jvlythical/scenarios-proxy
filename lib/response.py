@@ -1,19 +1,19 @@
 # Modeled after Net::HTTP::Response
 
 class Response:
-  def __init__(self):
-    self.code = 0
-    self.headers = {}
-    self.body = ""
+    def __init__(self):
+        self._code = 0
+        self._headers = {}
+        self._body = ''
 
-  def with_code(self, code):
-    self.code = code
-    return self
+    @property
+    def code(self):
+        return self._code
 
-  def with_headers(self, headers):
-    self.headers = headers
-    return self
+    @property
+    def header(self):
+        return self._headers
 
-  def with_body(self, body):
-    self.body = body
-    return self
+    @property
+    def body(self):
+        return self._body

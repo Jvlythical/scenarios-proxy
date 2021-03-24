@@ -2,28 +2,44 @@
 # https://guides.rubyonrails.org/action_controller_overview.html#the-request-object
 class Request:
     def __init__(self):
-        self.method = ""
-        self.url = ""
-        self.base_url = ""
-        self.headers = {}
-        self.body = ""
+        self._method = ''
+        self._url = ''
+        self._path = ''
+        self._base_url = ''
+        self._headers = {}
+        self._body = ''
+        self._query = {}
+        self._content_type = ''
 
-    def with_method(self, method):
-        self.method = method
-        return self
+    @property
+    def method(self):
+        return self._method
 
-    def with_url(self, url):
-        self.url = url
-        return self
+    @property
+    def url(self):
+        return self._url
 
-    def with_base_url(self, base_url):
-        self.base_url = base_url
-        return self
+    @property
+    def base_url(self):
+        return self._base_url
 
-    def with_headers(self, headers):
-        self.headers = headers
-        return self
+    @property
+    def path(self):
+        return self._path
 
-    def with_body(self, body):
-        self.body = body
-        return self
+    @property
+    def headers(self):
+        return self._headers
+
+    @property
+    def body(self):
+        return self._body
+
+    @property
+    def query(self):
+        return self._query
+
+    @property
+    def content_type(self):
+        return self._content_type
+
