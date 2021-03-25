@@ -1,4 +1,5 @@
 #!/bin/bash
-#!/usr/bin/env pipenv-shebang
+
+python3 hot_reload.py &
 
 $1 -s record.py --anticache

@@ -1,7 +1,10 @@
+import importlib
 import json
 import pdb
 import re
 import time
+
+import lib
 
 from mitmproxy import http
 from urllib.parse import urlparse
@@ -14,6 +17,16 @@ from lib.mitmproxy_response_adapter import MitmproxyResponseAdapter
 from lib.proxy_request import ProxyRequest
 from lib.settings import Settings
 from lib.scenarios_api import ScenariosApi
+
+# mitmproxy only hot reloads the main script, manually hot reload lib
+importlib.reload(lib.hashed_request_decorator)
+importlib.reload(lib.joined_request)
+importlib.reload(lib.logger)
+importlib.reload(lib.mitmproxy_request_adapter)
+importlib.reload(lib.mitmproxy_response_adapter)
+importlib.reload(lib.proxy_request)
+importlib.reload(lib.settings)
+importlib.reload(lib.scenarios_api)
 
 LOG_ID = 'record'
 
@@ -107,9 +120,6 @@ def response(flow):
             [RECORD_POLICY['ALL'], RECORD_POLICY['NOT_FOUND'], RECORD_POLICY['NONE'], upload_policy]
         )
 
-def done():
-    sys.exit(1)
-
 ### PRIVATE
 
 ###
@@ -157,7 +167,7 @@ def __handle_mock(flow, settings):
             [MOCK_POLICY['ALL'], MOCK_POLICY['FOUND'], MOCK_POLICY['NONE'], mock_policy]
         )
 
-    return pass_on(flow, res)
+    return __pass_on(flow, res)
 
 def __handle_record(request, settings):
     active_mode_settings = settings.active_mode_settings
@@ -236,7 +246,7 @@ def __eval_request(request, api, settings, ignored_components_json = None):
 #
 # Return response headers, body, and status code
 #
-def pass_on(flow, res):
+def __pass_on(flow, res):
     headers = {}
     for key, value in res.headers.items():
         headers[key.capitalize()] = value
@@ -379,3 +389,4 @@ def __get_service_url(request, settings):
             return settings.get('service_url')
 
         return f"{request.scheme}://{request.host}:{request.port}"
+
