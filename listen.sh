@@ -1,4 +1,0 @@
-export SCENARIO_API_KEY=yGBxPUzz7T2cQ47ieN6bXptG
-export SCENARIO_PROJECT_ID=43
-
-python transport.py
