@@ -15,6 +15,8 @@ from lib.proxy_request import ProxyRequest
 from lib.settings import Settings
 from lib.scenarios_api import ScenariosApi
 
+LOG_ID = 'record'
+
 MOCK_POLICY = {
     'ALL': 'all',
     'NONE': 'none',
@@ -320,9 +322,9 @@ def __simulate_latency(expected_latency, start_time):
 
     wait_time = expected_latency - estimated_rtt_network_latency - api_latency
 
-    print(f"  Expected latency: {expected_latency}")
-    print(f"  API latency: {api_latency}")
-    print(f"  Wait time: {wait_time}")
+    logger.instance().debug(f"{LOG_ID}:Expected latency: {expected_latency}")
+    logger.instance().debug(f"{LOG_ID}:API latency: {api_latency}")
+    logger.instance().debug(f"{LOG_ID}:Wait time: {wait_time}")
 
     if wait_time > 0:
         time.sleep(wait_time)
