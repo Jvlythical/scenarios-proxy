@@ -34,11 +34,11 @@ class HashedRequestDecorator:
             component_name = ignored_component['name']
             component_type = ignored_component['type']
 
-            if component_type == COMPONENT_TYPES['HEADER']:
+            if component_type == self.COMPONENT_TYPES['HEADER']:
                 self.ignored_headers[component_name] = True
-            elif component_type == COMPONENT_TYPES['QUERY_PARAM']:
+            elif component_type == self.COMPONENT_TYPES['QUERY_PARAM']:
                 self.ignored_query_params[component_name] = True
-            elif component_type == COMPONENT_TYPES['BODY_PARAM']:
+            elif component_type == self.COMPONENT_TYPES['BODY_PARAM']:
                 self.ignored_body_params[component_name] = True
 
         return self
