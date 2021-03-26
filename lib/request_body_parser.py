@@ -16,6 +16,9 @@ class RequestBodyParser:
     def parse(cls, request):
         content = request.body
 
+        if isinstance(content, bytes):
+            content = content.decode('utf-8')
+
         params = {}
 
         content_type = request.content_type

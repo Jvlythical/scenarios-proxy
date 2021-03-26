@@ -40,7 +40,7 @@ class MitmproxyRequestAdapter(Request):
     @property
     def content_type(self):
         for key, value in self.headers.items():
-            if key.capitalize() == 'Content-Type':
+            if key.lower() == 'content-type':
                 return value
         return ''
 

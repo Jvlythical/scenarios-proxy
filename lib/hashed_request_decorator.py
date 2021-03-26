@@ -58,7 +58,6 @@ class HashedRequestDecorator:
                 param_hash = hashlib.md5(self.__serialize_param(key, param)).hexdigest()
                 serialized_params.append(param_hash)
 
-
         if len(serialized_params) == 0:
             return ''
 
