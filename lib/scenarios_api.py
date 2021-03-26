@@ -31,7 +31,7 @@ class ScenariosApi:
             return {}
 
     @staticmethod
-    def decode_scenario_key(jwt):
+    def decode_scenario_key(key):
         try:
             key = base64.b64decode(key)
         except:
@@ -53,8 +53,10 @@ class ScenariosApi:
 
         self.__parse_scenario_key(params)
 
+        project_data = self.decode_project_key(project_key)
+
         body = {
-            'project_id': self.decode_project_key(project_key)['id'],
+            'project_id': project_data.get('id'),
             'requests': raw_requests,
             **params,
         }
@@ -66,8 +68,10 @@ class ScenariosApi:
 
         self.__parse_scenario_key(query_params)
 
+        project_data = self.decode_project_key(project_key)
+
         params = {
-            'project_id': self.decode_project_key(project_key)['id'],
+            'project_id': project_data.get('id'),
             **query_params,
         }
 
@@ -76,9 +80,14 @@ class ScenariosApi:
         return requests.get(url, headers=self.default_headers, params=params)
 
     def __parse_scenario_key(self, params):
-        if 'scenario_key' in params:
-            if len(params['scenario_key']) > 0:
-                scenario_id = self.decode_scenario_key(params['scenario_key'])['id']
+        if not 'scenario_key' in params:
+            return
+
+        if len(params['scenario_key']) == 0:
+            scenario_data = self.decode_scenario_key(params['scenario_key'])
+
+            if 'id' in scenario_data:
+                scenario_id = scenario_data['id']
                 params['scenario_id'] = scenario_id
 
-            del params['scenario_key']
+        del params['scenario_key']
