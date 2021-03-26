@@ -49,8 +49,8 @@ MODE = {
 }
 
 CUSTOM_RESPONSE_CODES = {
-    'NOT_FOUND': '499',
-    'IGNORE_COMPONENTS': '498',
+    'NOT_FOUND': 499,
+    'IGNORE_COMPONENTS': 498,
 }
 
 CUSTOM_HEADERS = {
@@ -70,6 +70,7 @@ def request(flow):
     settings = Settings.instance()
 
     mode = __get_proxy_mode(request.headers, settings)
+
     if mode == MODE['NONE']:
         pass
     elif mode == MODE['RECORD']:
@@ -150,16 +151,16 @@ def __handle_mock(flow, settings):
         res = __eval_request(request, api, active_mode_settings)
 
         if res.status_code == CUSTOM_RESPONSE_CODES['IGNORE_COMPONENTS']:
-            res = __eval_request(request, api, actie_mode_settings, res.body)
+            res = __eval_request(request, api, active_mode_settings, res.content)
 
-            __simulate_latency(res[CUSTOM_HEADERS['RESPONSE_LATENCY']], start_time)
+            __simulate_latency(res.headers.get(CUSTOM_HEADERS['RESPONSE_LATENCY']), start_time)
     elif mock_policy == MOCK_POLICY['FOUND']:
         res = __eval_request(request, api, active_mode_settings)
 
         if res.status_code == CUSTOM_RESPONSE_CODES['NOT_FOUND']:
             return __reverse_proxy(request, service_url, get_options())
         else:
-            __simulate_latency(res[CUSTOM_HEADERS['RESPONSE_LATENCY']], start_time)
+            __simulate_latency(res.headers.get(CUSTOM_HEADERS['RESPONSE_LATENCY']), start_time)
     else:
         return __bad_request(
             flow,
@@ -323,7 +324,7 @@ def __build_query_params(request, ignored_components = []):
 # api_latency = current_time - start_time of this request
 #
 def __simulate_latency(expected_latency, start_time):
-    if not expected_latency.nil:
+    if not expected_latency:
         return 0
 
     estimated_rtt_network_latency = 0.015 # seconds
