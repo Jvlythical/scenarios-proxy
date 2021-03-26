@@ -98,7 +98,7 @@ class HashedRequestDecorator:
         if len(text) == 0:
             return text
 
-        return hashlib.md5(text)
+        return hashlib.md5(text).hexdigest()
 
     def __serialize_param(self, key, val):
         return f"{key}.{str(val)}".encode('utf-8')
