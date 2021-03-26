@@ -19,7 +19,7 @@ class MitmproxyRequestAdapter(Request):
 
     @property
     def base_url(self):
-            return f"{self.request.scheme}://{self.request.host}:{self.request.port}"
+        return f"{self.request.scheme}://{self.request.host}:{self.request.port}"
 
     @property
     def method(self):
@@ -31,7 +31,12 @@ class MitmproxyRequestAdapter(Request):
 
     @property
     def body(self):
-        return self.request.raw_content
+        content = self.request.raw_content
+
+        if isinstance(content, bytes):
+            content = content.decode('utf-8')
+
+        return content
 
     @property
     def query(self):

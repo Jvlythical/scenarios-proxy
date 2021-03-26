@@ -1,3 +1,5 @@
+import pdb
+
 from .response import  Response
 
 class MitmproxyResponseAdapter(Response):
@@ -15,4 +17,9 @@ class MitmproxyResponseAdapter(Response):
 
     @property
     def body(self):
-        return self.response.raw_content
+        content = self.response.raw_content
+
+        if isinstance(content, bytes):
+            content = content.decode('utf-8')
+
+        return content
