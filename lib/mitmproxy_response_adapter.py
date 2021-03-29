@@ -17,9 +17,15 @@ class MitmproxyResponseAdapter(Response):
 
     @property
     def body(self):
-        content = self.response.raw_content
+        content = self.response.content
 
-        if isinstance(content, bytes):
-            content = content.decode('utf-8')
+        if not content:
+            return ''
+
+        try:
+            if isinstance(content, bytes):
+                return content.decode('utf-8')
+        except:
+            return ''.join(map(chr, content))
 
         return content

@@ -31,10 +31,13 @@ class MitmproxyRequestAdapter(Request):
 
     @property
     def body(self):
-        content = self.request.raw_content
+        content = self.request.content
 
-        if isinstance(content, bytes):
-            content = content.decode('utf-8')
+        try:
+            if isinstance(content, bytes):
+                content = content.decode('utf-8')
+        except:
+            return ''.join(map(chr, content))
 
         return content
 

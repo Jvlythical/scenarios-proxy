@@ -46,12 +46,12 @@ class ResponseString:
             self.lines.append(line)
 
     def body(self):
-        if not self.response.body:
+        body = self.response.body
+
+        if not body:
             self.lines.append(self.CLRF)
-        elif isinstance(self.response.body, str):
-            self.lines.append("{}{}".format(self.CLRF, self.response.body))
-        elif isinstance(self.response.body, bytes):
-            self.lines.append("{}{}".format(self.CLRF, self.response.body.decode('utf-8')))
+        elif isinstance(body, str):
+            self.lines.append("{}{}".format(self.CLRF, body))
         else:
             raise Exception("Unsupported body type")
 
