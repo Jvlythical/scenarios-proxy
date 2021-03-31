@@ -283,6 +283,7 @@ def __path_matches(path, patterns):
 #
 # Formats request into parameters expected by scenarios api
 #
+# @param request [lib.mitmproxy_request_adapter.MitmproxyRequestAdapter]
 # @param ignored_components [Array<Hash>]
 #
 # @return [Hash] query parameters to pass to scenarios api
@@ -296,7 +297,9 @@ def __build_query_params(request, ignored_components = []):
     body_text_hash = hashed_request.body_text_hash()
 
     query_params = {}
+    query_params['host'] = request.host
     query_params['path'] = request.path
+    query_params['port'] = request.port
     query_params['method'] = request.method
 
     if len(query_params_hash) > 0:
