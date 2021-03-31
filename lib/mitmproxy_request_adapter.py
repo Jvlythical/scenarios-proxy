@@ -52,5 +52,12 @@ class MitmproxyRequestAdapter(Request):
                 return value
         return ''
 
+    @property
+    def host(self):
+        return self.request.host
 
+
+    @property
+    def port(self):
+        return self.request.port
 
