@@ -4,7 +4,8 @@ from .request_string import RequestString
 from .response_string import ResponseString
 
 class JoinedRequest:
-    REQUEST_DELIMITTER = '🐵🙈🙉'
+    ENCODING = 'utf-8'
+    REQUEST_DELIMITTER = '🐵🙈🙉'.encode(ENCODING)
 
     ###
     #
@@ -34,4 +35,6 @@ class JoinedRequest:
         request_string = self.request_string.get()
         response_string = self.response_string.get()
 
-        return self.REQUEST_DELIMITTER.join([request_string, response_string])
+        joined = self.REQUEST_DELIMITTER.join([request_string, response_string])
+
+        return joined
