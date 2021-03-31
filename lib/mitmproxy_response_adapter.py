@@ -1,3 +1,4 @@
+import base64
 import pdb
 
 from .response import  Response
@@ -20,12 +21,6 @@ class MitmproxyResponseAdapter(Response):
         content = self.response.content
 
         if not content:
-            return ''
-
-        try:
-            if isinstance(content, bytes):
-                return content.decode('utf-8')
-        except:
-            return ''.join(map(chr, content))
+            return b''
 
         return content
