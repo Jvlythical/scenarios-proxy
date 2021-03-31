@@ -54,8 +54,12 @@ class HashedRequestDecorator:
             if key in self.ignored_query_params:
                 continue
 
-            for param in value:
-                param_hash = hashlib.md5(self.__serialize_param(key, param)).hexdigest()
+            if isinstance(value, list):
+                for param in value:
+                    param_hash = hashlib.md5(self.__serialize_param(key, param)).hexdigest()
+                    serialized_params.append(param_hash)
+            else:
+                param_hash = hashlib.md5(self.__serialize_param(key, value)).hexdigest()
                 serialized_params.append(param_hash)
 
         if len(serialized_params) == 0:
