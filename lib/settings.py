@@ -30,6 +30,10 @@ class Settings:
         return cls._instance
 
     @property
+    def agent_url(self):
+        return self.config.get('agent_url')
+
+    @property
     def api_url(self):
         return self.config.get('api_url')
 
