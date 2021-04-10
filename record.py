@@ -3,12 +3,14 @@ import json
 import pdb
 import re
 import time
+import threading
 
 import lib
 
 from mitmproxy import http
 from urllib.parse import urlparse
 
+from lib.agent_api import AgentApi
 from lib.hashed_request_decorator import HashedRequestDecorator
 from lib.joined_request import JoinedRequest
 from lib.logger import Logger
@@ -29,6 +31,10 @@ importlib.reload(lib.settings)
 importlib.reload(lib.scenarios_api)
 
 LOG_ID = 'record'
+
+AGENT_STATUSES = {
+    'REQUESTS_MODIFIED': 'requests-modified'
+}
 
 MOCK_POLICY = {
     'ALL': 'all',
@@ -106,11 +112,15 @@ def response(flow):
         upload_policy = RECORD_POLICY['NONE']
 
     if upload_policy == RECORD_POLICY['ALL']:
+        #thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
+        #thread.start()
         __upload_request(flow, api, settings)
     elif upload_policy == RECORD_POLICY['NOT_FOUND']:
         res = __eval_request(request, api)
 
         if res.status_code == CUSTOM_RESPONSE_CODES['NOT_FOUND']:
+            #thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
+            #thread.start()
             __upload_request(flow, api, settings)
     elif upload_policy == RECORD_POLICY['NONE']:
         pass
@@ -210,7 +220,7 @@ def __upload_request(flow, api, settings):
 
     Logger.instance().info(f"Uploading {proxy_request.url()}")
 
-    api.request_create(
+    res = api.request_create(
         active_mode_settings.get('project_key'),
         joined_request.build(),
         {
@@ -219,6 +229,18 @@ def __upload_request(flow, api, settings):
         }
 
     )
+
+    if res.status_code == 201:
+        agent_url = settings.agent_url
+
+        if not agent_url:
+            Logger.instance().warn('Settings.agent_url not configured')
+        else:
+            api = AgentApi(agent_url)
+            api.update_status(AGENT_STATUSES['REQUESTS_MODIFIED'], active_mode_settings.get('project_key'))
+
+    return res
+
 
 ###
 #
