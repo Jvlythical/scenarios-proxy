@@ -4,8 +4,6 @@ import requests
 import urllib
 import pdb
 
-from jwt import JWT
-
 from .logger import Logger
 
 class ScenariosApi:
@@ -83,7 +81,7 @@ class ScenariosApi:
         if not 'scenario_key' in params:
             return
 
-        if len(params['scenario_key']) == 0:
+        if len(params['scenario_key']) != 0:
             scenario_data = self.decode_scenario_key(params['scenario_key'])
 
             if 'id' in scenario_data:
