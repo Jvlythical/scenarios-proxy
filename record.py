@@ -105,7 +105,7 @@ def response(flow):
       settings.api_url, settings.api_key
     )
 
-    if active_mode_settings.get('enabled') and __path_matches(request, active_mode_settings.get('match_patterns')):
+    if active_mode_settings.get('enabled') and __allowed_request(request):
         upload_policy = __get_record_policy(request.headers, active_mode_settings)
     else:
         # If the request path does not match accepted paths, do not record
@@ -149,7 +149,7 @@ def __handle_mock(flow, settings):
       settings.api_url, settings.api_key
     )
 
-    if active_mode_settings.get('enabled') and __path_matches(request, active_mode_settings.get('match_patterns')):
+    if active_mode_settings.get('enabled') and __allowed_request(request):
         mock_policy = __get_mock_policy(request.headers, active_mode_settings)
     else:
         # If the request path does not match accepted paths, do not mock
@@ -287,11 +287,17 @@ def __bad_request(flow, message):
 
     return False
 
+def __allowed_request(request):
+    if __include(request, active_mode_settings.get('include_patterns'))
+        return True
+
+    return __exclude(request,  active_mode_settings.get('exclude_patterns'))
+
 ###
 #
 # @param patterns [Array<string>]
 #
-def __path_matches(request, patterns):
+def __include(request, patterns):
     if not patterns:
         return True
 
@@ -299,7 +305,17 @@ def __path_matches(request, patterns):
         if re.match(pattern, request.url):
             return True
 
-    return patterns.length == 0
+    return False
+
+def __exclude(request, patterns):
+    if not patterns:
+        return False
+
+    for pattern in patterns:
+        if re.match(pattern, request.url):
+            return True
+
+    return False
 
 ###
 #
