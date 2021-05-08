@@ -291,12 +291,12 @@ def __bad_request(flow, message):
 #
 # @param patterns [Array<string>]
 #
-def __path_matches(path, patterns):
+def __path_matches(request, patterns):
     if not patterns:
         return True
 
     for pattern in patterns:
-        if re.match(pattern, path):
+        if re.match(pattern, request.url):
             return True
 
     return patterns.length == 0
