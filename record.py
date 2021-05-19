@@ -288,7 +288,7 @@ def __bad_request(flow, message):
     return False
 
 def __allowed_request(request):
-    if __include(request, active_mode_settings.get('include_patterns'))
+    if __include(request, active_mode_settings.get('include_patterns')):
         return True
 
     return __exclude(request,  active_mode_settings.get('exclude_patterns'))
