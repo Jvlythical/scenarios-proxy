@@ -74,7 +74,6 @@ def request(flow):
     __disable_web_cache(request)
 
     settings = Settings.instance()
-
     mode = __get_proxy_mode(request.headers, settings)
 
     if mode == MODE['NONE']:
@@ -92,6 +91,8 @@ def request(flow):
 def response(flow):
     settings = Settings.instance()
     request = flow.request
+
+    Logger.instance().info(flow.response.headers)
 
     mode = __get_proxy_mode(request.headers, settings)
     if mode != MODE['RECORD']:
@@ -399,10 +400,12 @@ def __disable_web_cache(request):
 ### Getters
 
 def __get_proxy_mode(headers, settings):
-    if 'Access-Control-Request-Headers' in headers:
-        if CUSTOM_HEADERS['DO_PROXY'].lower() in headers['Access-Control-Request-Headers']:
-            return MODE['NONE']
-    elif CUSTOM_HEADERS['DO_PROXY'] in headers:
+    access_control_header =  'Access-Control-Request-Headers'
+    do_proxy_header = CUSTOM_HEADERS['DO_PROXY']
+
+    if access_control_header in headers and do_proxy_header.lower() in headers[access_control_header]:
+        return MODE['NONE']
+    elif do_proxy_header in headers:
         return MODE['NONE']
     elif CUSTOM_HEADERS['PROXY_MODE'] in headers:
         return headers[CUSTOM_HEADERS['PROXY_MODE']]
