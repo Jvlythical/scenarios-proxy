@@ -106,7 +106,7 @@ def response(flow):
       settings.api_url, settings.api_key
     )
 
-    if active_mode_settings.get('enabled') and __allowed_request(request):
+    if active_mode_settings.get('enabled') and __allowed_request(active_mode_settings, request):
         upload_policy = __get_record_policy(request.headers, active_mode_settings)
     else:
         # If the request path does not match accepted paths, do not record
@@ -150,7 +150,7 @@ def __handle_mock(flow, settings):
       settings.api_url, settings.api_key
     )
 
-    if active_mode_settings.get('enabled') and __allowed_request(request):
+    if active_mode_settings.get('enabled') and __allowed_request(active_mode_settings, request):
         mock_policy = __get_mock_policy(request.headers, active_mode_settings)
     else:
         # If the request path does not match accepted paths, do not mock
@@ -288,7 +288,7 @@ def __bad_request(flow, message):
 
     return False
 
-def __allowed_request(request):
+def __allowed_request(active_mode_settings, request):
     if __include(request, active_mode_settings.get('include_patterns')):
         return True
 
