@@ -76,6 +76,8 @@ def request(flow):
     settings = Settings.instance()
     mode = __get_proxy_mode(request.headers, settings)
 
+    Logger.instance().debug(f"Proxy Mode: {mode}")
+
     if mode == MODE['NONE']:
         pass
     elif mode == MODE['RECORD']:
@@ -92,9 +94,8 @@ def response(flow):
     settings = Settings.instance()
     request = flow.request
 
-    Logger.instance().info(flow.response.headers)
-
     mode = __get_proxy_mode(request.headers, settings)
+
     if mode != MODE['RECORD']:
         return False
 
@@ -112,17 +113,19 @@ def response(flow):
         # If the request path does not match accepted paths, do not record
         upload_policy = RECORD_POLICY['NONE']
 
+    Logger.instance().debug(f"Upload Policy: {upload_policy}")
+
     if upload_policy == RECORD_POLICY['ALL']:
         thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
         thread.start()
-        __upload_request(flow, api, settings)
+        #__upload_request(flow, api, settings)
     elif upload_policy == RECORD_POLICY['NOT_FOUND']:
         res = __eval_request(request, api)
 
         if res.status_code == CUSTOM_RESPONSE_CODES['NOT_FOUND']:
             thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
             thread.start()
-            __upload_request(flow, api, settings)
+            #__upload_request(flow, api, settings)
     elif upload_policy == RECORD_POLICY['NONE']:
         pass
     else:
@@ -300,6 +303,9 @@ def __allowed_request(active_mode_settings, request):
 #
 def __include(request, patterns):
     if not patterns:
+        return True
+
+    if len(patterns) == 0:
         return True
 
     for pattern in patterns:
