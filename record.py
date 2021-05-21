@@ -113,15 +113,15 @@ def response(flow):
         upload_policy = RECORD_POLICY['NONE']
 
     if upload_policy == RECORD_POLICY['ALL']:
-        #thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
-        #thread.start()
+        thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
+        thread.start()
         __upload_request(flow, api, settings)
     elif upload_policy == RECORD_POLICY['NOT_FOUND']:
         res = __eval_request(request, api)
 
         if res.status_code == CUSTOM_RESPONSE_CODES['NOT_FOUND']:
-            #thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
-            #thread.start()
+            thread = threading.Thread(target=__upload_request, args=(flow, api, settings))
+            thread.start()
             __upload_request(flow, api, settings)
     elif upload_policy == RECORD_POLICY['NONE']:
         pass
