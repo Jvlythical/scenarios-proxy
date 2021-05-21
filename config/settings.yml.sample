@@ -1,4 +1,5 @@
 ---
+agent_url: http://localhost:3001
 api_url: http://localhost:3000
 api_key: 5UUvyYLtVesWYBRwDUpaDxay
 mode:
@@ -18,4 +19,4 @@ mode:
     policy: all
     project_key: eyJhbGciOiJub25lIn0.eyJpZCI6MTYsIm9yZ2FuaXphdGlvbl9pZCI6Mn0.
     scenario_key: eyJhbGciOiJub25lIn0.eyJpZCI6MjcsInByb2plY3RfaWQiOjE2fQ.
-    service_url: http://localhost:3000
+    oervice_url: http://localhost:3000
