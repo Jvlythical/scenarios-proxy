@@ -1,21 +1,21 @@
 ---
-:api_url: http://localhost:3000
-:api_key: 5UUvyYLtVesWYBRwDUpaDxay
-:mode:
-  :active: record
-  :record:
-    :enabled: false
-    :exclude_patterns: []
-    :include_patterns: []
-    :policy: all
-    :service_url: ''
-    :project_key: eyJhbGciOiJub25lIn0.eyJpZCI6MTYsIm9yZ2FuaXphdGlvbl9pZCI6Mn0.
-    :scenario_key: ''
-  :mock:
-    :enabled: false
-    :exclude_patterns: []
-    :include_patterns: []
-    :policy: all
-    :project_key: eyJhbGciOiJub25lIn0.eyJpZCI6MTYsIm9yZ2FuaXphdGlvbl9pZCI6Mn0.
-    :scenario_key: eyJhbGciOiJub25lIn0.eyJpZCI6MjcsInByb2plY3RfaWQiOjE2fQ.
-    :service_url: http://localhost:3000
+api_url: http://localhost:3000
+api_key: 5UUvyYLtVesWYBRwDUpaDxay
+mode:
+  active: record
+  record:
+    enabled: false
+    exclude_patterns: []
+    include_patterns: []
+    policy: all
+    service_url: ''
+    project_key: eyJhbGciOiJub25lIn0.eyJpZCI6MTYsIm9yZ2FuaXphdGlvbl9pZCI6Mn0.
+    scenario_key: ''
+  mock:
+    enabled: false
+    exclude_patterns: []
+    include_patterns: []
+    policy: all
+    project_key: eyJhbGciOiJub25lIn0.eyJpZCI6MTYsIm9yZ2FuaXphdGlvbl9pZCI6Mn0.
+    scenario_key: eyJhbGciOiJub25lIn0.eyJpZCI6MjcsInByb2plY3RfaWQiOjE2fQ.
+    service_url: http://localhost:3000
