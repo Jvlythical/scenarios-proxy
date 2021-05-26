@@ -44,6 +44,7 @@ class ScenariosApi:
     def default_headers(self):
         return {
             'X_API_KEY': self.api_key,
+            'X-Do-Proxy': '1',
         }
 
     def request_create(self, project_key, raw_requests, params):
